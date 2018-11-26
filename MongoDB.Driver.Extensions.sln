@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MongoDB.Driver.Extensions", "src\MongoDB.Driver.Extensions\MongoDB.Driver.Extensions.csproj", "{95D811D8-32E2-4429-9D33-0B23B31E8FD9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{0DF2E419-854B-4D57-8B65-F4CC803FC794}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{F98BCE7C-D85B-4C90-AC7A-5AEA6FB5C2EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MongoDb.Driver.Extensions.Sample.AspNetCore", "sample\MongoDb.Driver.Extensions.Sample.AspNetCore\MongoDb.Driver.Extensions.Sample.AspNetCore.csproj", "{160F166B-1887-4827-9022-30A444B7BB61}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{95D811D8-32E2-4429-9D33-0B23B31E8FD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95D811D8-32E2-4429-9D33-0B23B31E8FD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95D811D8-32E2-4429-9D33-0B23B31E8FD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95D811D8-32E2-4429-9D33-0B23B31E8FD9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{160F166B-1887-4827-9022-30A444B7BB61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{160F166B-1887-4827-9022-30A444B7BB61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{160F166B-1887-4827-9022-30A444B7BB61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{160F166B-1887-4827-9022-30A444B7BB61}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{95D811D8-32E2-4429-9D33-0B23B31E8FD9} = {0DF2E419-854B-4D57-8B65-F4CC803FC794}
+		{160F166B-1887-4827-9022-30A444B7BB61} = {F98BCE7C-D85B-4C90-AC7A-5AEA6FB5C2EE}
+	EndGlobalSection
+EndGlobal
