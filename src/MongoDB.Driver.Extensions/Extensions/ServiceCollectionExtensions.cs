@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using MongoDB.Driver;
 using MongoDB.Driver.Extensions.Abstractions;
 using MongoDB.Driver.Extensions.Configurations;
 using MongoDB.Driver.Extensions.Implementations;
@@ -18,7 +19,10 @@ namespace Microsoft.Extensions.DependencyInjection
                 services.AddSingleton(configuration);
             }
                 
+            
+            IMongoClient client = new MongoClient(configuration.ConnectionString);
             services.AddSingleton<IAuditRepository, AuditRepository>();
+            services.AddSingleton(client);
 
             return services;
         }

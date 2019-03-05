@@ -1,19 +1,22 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using MongoDb.Driver.Extensions.Sample.AspNetCore.Controllers.Requests;
 using MongoDb.Driver.Extensions.Sample.AspNetCore.Data;
 using MongoDb.Driver.Extensions.Sample.AspNetCore.Data.Documents;
+using MongoDB.Driver.Extensions.Abstractions;
+using MongoDB.Driver.Extensions.Implementations;
 using MongoDB.Driver.Extensions.Paging.Requests;
 
 namespace MongoDb.Driver.Extensions.Sample.AspNetCore.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]
+    //[ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IUserRepository userRepository;
+        private readonly IRepository<User,string> userRepository;
 
-        public UserController(IUserRepository userRepository)
+        public UserController(IRepository<User,string> userRepository)
         {
             this.userRepository = userRepository;
         }
@@ -44,12 +47,12 @@ namespace MongoDb.Driver.Extensions.Sample.AspNetCore.Controllers
 
         // POST api/values
         [HttpPost]
-        public async Task Post([FromBody] string firstaname, [FromBody] string lastname)
+        public async Task Post([FromBody] AddUserRequest request)
         {
             var user = new User();
             user.Id = Guid.NewGuid().ToString();
-            user.FirstName = firstaname;
-            user.LastName = lastname;
+            user.FirstName = request.Firstname;
+            user.LastName = request.Lastname;
 
             await userRepository.SaveOrUpdateAsync(user);
         }
