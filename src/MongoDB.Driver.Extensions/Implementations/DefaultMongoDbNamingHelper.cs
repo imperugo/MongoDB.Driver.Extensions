@@ -4,7 +4,7 @@ using MongoDB.Driver.Extensions.Configurations;
 
 namespace MongoDB.Driver.Extensions.Implementations
 {
-    internal class DefaultMongoDbNamingHelper : IMongoDbNamingHelper
+    public class DefaultMongoDbNamingHelper : IMongoDbNamingHelper
     {
         public string GetDatabaseName(MongoDbDatabaseConfiguration configuration, string dbName)
         {

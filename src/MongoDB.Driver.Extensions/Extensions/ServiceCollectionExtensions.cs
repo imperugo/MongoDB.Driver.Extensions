@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using MongoDB.Driver;
 using MongoDB.Driver.Extensions.Abstractions;
 using MongoDB.Driver.Extensions.Configurations;
@@ -14,11 +14,15 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             bool configurationAlreadyRegisterd = services.Any(x => x.ServiceType == typeof(MongoDbDatabaseConfiguration));
 
-            if (!configurationAlreadyRegisterd)
+            if (configurationAlreadyRegisterd)
             {
-                services.AddSingleton(configuration);
-            }
-                
+                var descriptor =
+                    new ServiceDescriptor(
+                        configuration.GetType(),
+                        configuration);
+
+                services.Replace(descriptor);
+            } 
             
             IMongoClient client = new MongoClient(configuration.ConnectionString);
             services.AddSingleton<IAuditRepository, AuditRepository>();
@@ -27,17 +31,22 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
-        public static IServiceCollection AddMongoDbRepository(this IServiceCollection services, Action<MongoDbDatabaseConfiguration> opt)
+        public static IServiceCollection AddMongoDbRepository(this IServiceCollection services, Action<MongoDbDatabaseConfiguration> opt = null)
         {
-            if (opt == null)
-            {
-                throw new ArgumentNullException();
-            }
+            var configuration = services
+                .BuildServiceProvider()
+                .GetRequiredService<MongoDbDatabaseConfiguration>();
 
-            var conf = new MongoDbDatabaseConfiguration();
-            opt.Invoke(conf);
+            opt?.Invoke(configuration);
 
-            services.AddMongoDbRepository(conf);
+            services.AddMongoDbRepository(configuration);
+            
+            var descriptor =
+                new ServiceDescriptor(
+                    configuration.GetType(),
+                    configuration);
+
+            services.Replace(descriptor);
 
             return services;
         }

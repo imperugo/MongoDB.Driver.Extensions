@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace MongoDB.Driver.Extensions.Paging.Requests
+﻿namespace MongoDB.Driver.Extensions.Paging.Requests
 {
 	public class SimplePagedRequest
 	{
@@ -10,13 +8,18 @@ namespace MongoDB.Driver.Extensions.Paging.Requests
 			PageSize = 10;
 		}
 
-		/// <summary>
+        public SimplePagedRequest(int pageIndex, int pageSize)
+        {
+            PageIndex = pageIndex;
+            PageSize = pageSize;
+        }
+
+        /// <summary>
 		///     Gets or sets the index of the page.
 		/// </summary>
 		/// <value>
 		///     The index of the page.
 		/// </value>
-		[Range(0, int.MaxValue)]
 		public int PageIndex { get; set; }
 
 		/// <summary>
@@ -25,7 +28,6 @@ namespace MongoDB.Driver.Extensions.Paging.Requests
 		/// <value>
 		///     The size of the page.
 		/// </value>
-		[Range(1, int.MaxValue)]
 		public int PageSize { get; set; }
 	}
 }

@@ -1,10 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace MongoDB.Driver.Extensions.Paging.Requests
+﻿namespace MongoDB.Driver.Extensions.Paging.Requests
 {
 	public class SimpleKeyRequest<T>
 	{
-		[Required]
-		public virtual T Id { get; set; }
+        public SimpleKeyRequest()
+        {
+        }
+
+        public SimpleKeyRequest(T id)
+        {
+            Id = id;
+        }
+
+        public virtual T Id { get; set; }
 	}
 }

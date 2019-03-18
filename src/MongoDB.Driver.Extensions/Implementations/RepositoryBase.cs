@@ -49,7 +49,13 @@ namespace MongoDB.Driver.Extensions.Implementations
 
         public virtual async Task<bool> ExistAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellation = default)
         {
-            return (await Collection.Find(predicate).CountDocumentsAsync(cancellation)) > 0;
+            var result = await Collection.Find(predicate)
+                .Limit(1)
+                .Project(x => x.Id)
+                .FirstOrDefaultAsync(cancellation)
+                .ConfigureAwait(false);
+
+            return result != null;
         }
 
         public virtual Task<bool> ExistAsync(TK id, CancellationToken cancellation = default)
@@ -59,9 +65,18 @@ namespace MongoDB.Driver.Extensions.Implementations
 
         public virtual async Task<bool> ExistAsync(FilterDefinition<T> filters, CancellationToken cancellation = default)
         {
-            return await Collection.Find(filters)
-                       .CountDocumentsAsync(cancellation)
-                       .ConfigureAwait(false) > 0;
+            if (filters == null)
+            {
+                filters = Builders<T>.Filter.Empty;
+            }
+            
+            var result = await Collection.Find(filters)
+                    .Limit(1)
+                    .Project(x => x.Id)
+                    .FirstOrDefaultAsync(cancellation)
+                    .ConfigureAwait(false);
+            
+            return result != null;
         }
 
         public virtual Task InsertManyAsync(IEnumerable<T> documents, CancellationToken cancellation = default)
@@ -86,7 +101,7 @@ namespace MongoDB.Driver.Extensions.Implementations
 
             return Collection.Find(f1)
                 .Limit(1)
-                .SingleOrDefaultAsync(cancellationToken: cancellation);
+                .SingleOrDefaultAsync(cancellation);
         }
 
         public virtual Task<IPagedResult<T>> GetPagedListAsync(SimplePagedRequest request, FilterDefinition<T> filters = null, SortDefinition<T> sort = null, CancellationToken cancellation = default)
@@ -96,13 +111,12 @@ namespace MongoDB.Driver.Extensions.Implementations
                 filters = Builders<T>.Filter.Empty;
             }
 
-            return Collection.ToPagedResultAsync<T, TK>(filters, request, sort, cancellationToken: cancellation);
+            return Collection.ToPagedResultAsync<T, TK>(filters, request, sort, cancellation);
         }
 
         public virtual async Task<T> AddAsync(T entity, CancellationToken cancellation = default)
         {
-            await Collection.InsertOneAsync(entity, cancellationToken: cancellation)
-                .ConfigureAwait(false);
+            await Collection.InsertOneAsync(entity, cancellationToken: cancellation).ConfigureAwait(false);
 
             return entity;
         }
@@ -110,8 +124,7 @@ namespace MongoDB.Driver.Extensions.Implementations
         public virtual async Task<T> UpdateAsync(T entity, CancellationToken cancellation = default)
         {
             var f = Builders<T>.Filter.Eq(x => x.Id, entity.Id);
-            await Collection.ReplaceOneAsync(f, entity, cancellationToken: cancellation)
-                .ConfigureAwait(false);
+            await Collection.ReplaceOneAsync(f, entity, cancellationToken: cancellation).ConfigureAwait(false);
 
             return entity;
         }
