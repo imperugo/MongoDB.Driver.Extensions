@@ -17,7 +17,16 @@
         <RepositoryUrl>https://github.com/imperugo/MongoDB.Driver.Extensions</RepositoryUrl>
         <RepositoryType>Git</RepositoryType>
         <PackageTags>mongodb mongo nosql</PackageTags>
-    </PropertyGroup>
+    
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+  </ItemGroup>
+
 
     <PropertyGroup>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
