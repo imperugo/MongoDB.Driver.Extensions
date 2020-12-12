@@ -1,7 +1,7 @@
 ﻿namespace MongoDB.Driver.Extensions.Paging.Requests
 {
-	public class SimpleKeyRequest<T>
-	{
+    public class SimpleKeyRequest<T>
+    {
         public SimpleKeyRequest()
         {
         }
@@ -12,5 +12,5 @@
         }
 
         public virtual T Id { get; set; }
-	}
+    }
 }

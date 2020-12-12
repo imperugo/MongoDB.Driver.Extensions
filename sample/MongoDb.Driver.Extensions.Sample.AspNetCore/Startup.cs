@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDb.Driver.Extensions.Sample.AspNetCore.Data;
@@ -29,24 +27,16 @@ namespace MongoDb.Driver.Extensions.Sample.AspNetCore
 
             services.AddMongoDbRepository(dbConfiguration);
 
-            services.AddSingleton<IRepository<User,string>, UserRepository>();
-            
-            services
-                .AddMvc()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddSingleton<IRepository<User, string>, UserRepository>();
+            services.AddSingleton<IMongoDbNamingHelper, OverrideNamingConvention>();
+
+            services.AddMvc(opt => opt.EnableEndpointRouting = false);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseHsts();
-            }
+            app.UseDeveloperExceptionPage();
 
             app.UseHttpsRedirection();
             app.UseMvc();

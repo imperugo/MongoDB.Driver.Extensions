@@ -6,6 +6,7 @@ namespace MongoDb.Driver.Extensions.Sample.AspNetCore.Controllers.Requests
     {
         [Required]
         public string Firstname { get; set; }
+
         [Required]
         public string Lastname { get; set; }
     }

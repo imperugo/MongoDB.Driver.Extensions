@@ -12,7 +12,7 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IServiceCollection AddMongoDbRepository(this IServiceCollection services, MongoDbDatabaseConfiguration configuration)
         {
-            bool configurationAlreadyRegisterd = services.Any(x => x.ServiceType == typeof(MongoDbDatabaseConfiguration));
+            var configurationAlreadyRegisterd = services.Any(x => x.ServiceType == typeof(MongoDbDatabaseConfiguration));
 
             if (configurationAlreadyRegisterd)
             {
@@ -22,11 +22,12 @@ namespace Microsoft.Extensions.DependencyInjection
                         configuration);
 
                 services.Replace(descriptor);
-            } 
-            
+            }
+
             IMongoClient client = new MongoClient(configuration.ConnectionString);
             services.AddSingleton<IAuditRepository, AuditRepository>();
             services.AddSingleton(client);
+            services.AddSingleton(configuration);
 
             return services;
         }
@@ -40,7 +41,7 @@ namespace Microsoft.Extensions.DependencyInjection
             opt?.Invoke(configuration);
 
             services.AddMongoDbRepository(configuration);
-            
+
             var descriptor =
                 new ServiceDescriptor(
                     configuration.GetType(),

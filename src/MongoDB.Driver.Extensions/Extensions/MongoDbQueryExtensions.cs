@@ -1,74 +1,89 @@
-﻿using System.Threading;
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver.Extensions.Documents;
 using MongoDB.Driver.Extensions.Paging.Requests;
 using MongoDB.Driver.Extensions.Paging.Responses;
 
-namespace MongoDB.Driver.Extensions.Extensions
+namespace MongoDB.Driver
 {
-	public static class MongoDbQueryExtensions
-	{
-		public static IFindFluent<TDocument, TDocument> Paged<TDocument>(this IFindFluent<TDocument, TDocument> find, SimplePagedRequest request)
-		{
-			return find
-				.Limit(request.PageSize)
-				.Skip(request.PageIndex * request.PageSize);
-		}
+    public static class MongoDbQueryExtensions
+    {
+        public static IFindFluent<TDocument, TDocument> Paged<TDocument>(this IFindFluent<TDocument, TDocument> find, SimplePagedRequest request)
+        {
+            return find
+                .Limit(request.PageSize)
+                .Skip(request.PageIndex * request.PageSize);
+        }
 
-		public static async Task<IPagedResult<TDocument>> ToPagedResultAsync<TDocument, TKey>(
-			this IMongoCollection<TDocument> collection,
-			FilterDefinition<TDocument> filter,
-			SimplePagedRequest request,
-			SortDefinition<TDocument> sort = null,
-			CancellationToken cancellationToken = default(CancellationToken)) where TDocument : DocumentBase<TKey>
-		{
-			if (sort == null)
-				sort = Builders<TDocument>.Sort.Descending(x => x.Id);
+        public static IFindFluent<TDocument, TDocument> Paged<TDocument>(this IFindFluent<TDocument, TDocument> find, uint from, uint to)
+        {
+            var skip = from - 1;
+            var take = to - skip;
 
-			if (filter == null)
-				filter = Builders<TDocument>.Filter.Empty;
+            return find
+                .Limit((int?)take)
+                .Skip((int?)skip);
+        }
 
-			var result = collection
-				.Find(filter)
-				.Sort(sort)
-				.Limit(request.PageSize)
-				.Skip(request.PageIndex * request.PageSize)
-				.ToListAsync(cancellationToken);
+        public static Task<IPagedResult<TDocument>> ToPagedResultAsync<TDocument, TKey>(
+            this IMongoCollection<TDocument> collection,
+            FilterDefinition<TDocument> filter,
+            SimplePagedRequest request,
+            SortDefinition<TDocument> sort = null,
+            CancellationToken cancellationToken = default)
+            where TDocument : DocumentBase<TKey>
+        {
+            return collection.ToPagedResultAsync<TDocument, TKey, TDocument>(filter, request, (TDocument item) => item, sort, cancellationToken);
+        }
 
-			var count = collection
-				.Find(filter)
-				.CountDocumentsAsync(cancellationToken);
+        public static async Task<IPagedResult<TResult>> ToPagedResultAsync<TDocument, TKey, TResult>(
+            this IMongoCollection<TDocument> collection,
+            FilterDefinition<TDocument> filter,
+            SimplePagedRequest request,
+            Func<TDocument, TResult> transform,
+            SortDefinition<TDocument> sort = null,
+            CancellationToken cancellationToken = default)
+            where TDocument : DocumentBase<TKey>
+        {
+            if (filter == null)
+                filter = Builders<TDocument>.Filter.Empty;
 
-			await Task.WhenAll(result, count).ConfigureAwait(false);
+            var query = collection
+                .Find(filter);
 
-			return new PagedResult<TDocument>(request.PageIndex, request.PageSize, result.Result, count.Result);
-		}
-		
-		public static IPagedResult<TDocument> ToPagedResult<TDocument, TKey>(
-			this IMongoCollection<TDocument> collection,
-			FilterDefinition<TDocument> filter,
-			SimplePagedRequest request,
-			SortDefinition<TDocument> sort = null) where TDocument : DocumentBase<TKey>
-		{
-			if (sort == null)
-				sort = Builders<TDocument>.Sort.Descending(x => x.Id);
+            if (sort != null)
+                query.Sort(sort);
 
-			if (filter == null)
-				filter = Builders<TDocument>.Filter.Empty;
+            var result = query
+                .Paged(request)
+                .ToListAsync(cancellationToken);
 
+            var count = collection
+                .Find(filter)
+                .CountDocumentsAsync(cancellationToken);
 
-			var result = collection
-				.Find(filter)
-				.Sort(sort)
-				.Limit(request.PageSize)
-				.Skip(request.PageIndex * request.PageSize)
-				.ToList();
+            await Task.WhenAll(result, count);
 
-			var count = collection
-				.Find(filter)
-				.CountDocuments();
+            var methodResult = new TResult[result.Result.Count];
 
-			return new PagedResult<TDocument>(request.PageIndex, request.PageSize, result, count);
-		}
-	}
+            for (var i = 0; i < result.Result.Count; i++)
+                methodResult[i] = transform(result.Result[i]);
+
+            return new PagedResult<TResult>(request.PageIndex, request.PageSize, methodResult, count.Result);
+        }
+
+        public static async IAsyncEnumerable<TDocument> ToAsyncEnumerable<TDocument>(this IMongoCollection<TDocument> collection, FilterDefinition<TDocument> filter, FindOptions<TDocument, TDocument> options = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            using var cursor = await collection.FindAsync(filter, options, cancellationToken);
+
+            while (await cursor.MoveNextAsync())
+            {
+                foreach (var doc in cursor.Current)
+                    yield return doc;
+            }
+        }
+    }
 }

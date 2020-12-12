@@ -9,7 +9,7 @@ using MongoDB.Driver.Extensions.Paging.Responses;
 
 namespace MongoDB.Driver.Extensions.Abstractions
 {
-	/// <summary>
+    /// <summary>
     ///     IRepository definition.
     /// </summary>
     /// <typeparam name="T">The type contained in the repository.</typeparam>
@@ -140,5 +140,10 @@ namespace MongoDB.Driver.Extensions.Abstractions
         /// </summary>
         /// <returns>Count of entities in the repository.</returns>
         Task<long> CountAsync(CancellationToken cancellation = default);
+
+        /// <summary>
+        ///     Delete the collection.
+        /// </summary>
+        Task Drop(CancellationToken cancellation = default);
     }
 }

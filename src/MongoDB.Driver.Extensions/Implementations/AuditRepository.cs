@@ -14,12 +14,12 @@ namespace MongoDB.Driver.Extensions.Implementations
         public AuditRepository(MongoDbDatabaseConfiguration configuration, IMongoClient mongoClient, IMongoDbNamingHelper namingHelper = null)
         {
             this.mongoClient = mongoClient;
-            
+
             databaseName = namingHelper.GetDatabaseName(configuration, "admin");
             mongoClient.GetDatabase(databaseName);
         }
 
-        public async Task<DbStatus> CheckAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<DbStatus> CheckAsync(CancellationToken cancellationToken = default)
         {
             try
             {
@@ -28,7 +28,7 @@ namespace MongoDB.Driver.Extensions.Implementations
                     .GetDatabase(databaseName)
                     .RunCommandAsync<BsonDocument>(command, null, cancellationToken)
                     .ConfigureAwait(false);
-                	
+
                 return new DbStatus(databaseName, true);
             }
             catch
@@ -45,7 +45,7 @@ namespace MongoDB.Driver.Extensions.Implementations
                 mongoClient
                     .GetDatabase(databaseName)
                     .RunCommand<BsonDocument>(command);
-                	
+
                 return new DbStatus(databaseName, true);
             }
             catch

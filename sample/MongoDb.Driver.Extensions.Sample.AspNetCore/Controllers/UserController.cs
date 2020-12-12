@@ -2,10 +2,8 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MongoDb.Driver.Extensions.Sample.AspNetCore.Controllers.Requests;
-using MongoDb.Driver.Extensions.Sample.AspNetCore.Data;
 using MongoDb.Driver.Extensions.Sample.AspNetCore.Data.Documents;
 using MongoDB.Driver.Extensions.Abstractions;
-using MongoDB.Driver.Extensions.Implementations;
 using MongoDB.Driver.Extensions.Paging.Requests;
 
 namespace MongoDb.Driver.Extensions.Sample.AspNetCore.Controllers
@@ -14,9 +12,9 @@ namespace MongoDb.Driver.Extensions.Sample.AspNetCore.Controllers
     //[ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IRepository<User,string> userRepository;
+        private readonly IRepository<User, string> userRepository;
 
-        public UserController(IRepository<User,string> userRepository)
+        public UserController(IRepository<User, string> userRepository)
         {
             this.userRepository = userRepository;
         }
@@ -38,9 +36,7 @@ namespace MongoDb.Driver.Extensions.Sample.AspNetCore.Controllers
             var result = await userRepository.GetByIdAsync(id);
 
             if (result == null)
-            {
                 return NotFound();
-            }
 
             return Ok(result);
         }
@@ -64,15 +60,13 @@ namespace MongoDb.Driver.Extensions.Sample.AspNetCore.Controllers
             var user = await userRepository.GetByIdAsync(id);
 
             if (user == null)
-            {
                 return NotFound();
-            }
-            
+
             user.FirstName = firstaname;
             user.LastName = lastname;
 
             await userRepository.SaveOrUpdateAsync(user);
-            
+
             return new EmptyResult();
         }
 
@@ -83,10 +77,8 @@ namespace MongoDb.Driver.Extensions.Sample.AspNetCore.Controllers
             var deleteResponse = await userRepository.DeleteAsync(id);
 
             if (deleteResponse.DeletedCount < 1)
-            {
                 return NotFound();
-            }
-            
+
             return new EmptyResult();
         }
     }

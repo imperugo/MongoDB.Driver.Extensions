@@ -1,32 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>netstandard2.0</TargetFramework>
+  <PropertyGroup>
+    <Title>MongoDB.Driver.Extensions is a library that helps you to use MongoDB.</Title>
+    <Summary>MongoDB.Driver.Extensions is a library that helps you to use MongoDB.</Summary>
+    <AssemblyName>MongoDB.Driver.Extensions</AssemblyName>
+    <PackageId>MongoDB.Driver.Extensions</PackageId>
+    <PackageProjectUrl>https://github.com/imperugo/MongoDB.Driver.Extensions</PackageProjectUrl>
+    <PackageTags>mongodb mongo nosql</PackageTags>
+  </PropertyGroup>
 
-        <Title>MongoDB.Driver.Extensions is a library that helps you to use MongoDB.</Title>
-        <Summary>MongoDB.Driver.Extensions is a library that helps you to use MongoDB.</Summary>
-        <VersionPrefix>1.0.4</VersionPrefix>
-        <!--<VersionSuffix>dev</VersionSuffix>-->
-        <Authors>Ugo Lattanzi</Authors>
-        <Copyright>Ugo Lattanzi</Copyright>
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <AssemblyName>MongoDB.Driver.Extensions</AssemblyName>
-        <PackageId>MongoDB.Driver.Extensions</PackageId>
-        <PackageProjectUrl>https://github.com/imperugo/MongoDB.Driver.Extensions</PackageProjectUrl>
-        <LangVersion>latest</LangVersion>
-        <RepositoryUrl>https://github.com/imperugo/MongoDB.Driver.Extensions</RepositoryUrl>
-        <RepositoryType>Git</RepositoryType>
-        <PackageTags>mongodb mongo nosql</PackageTags>
-    </PropertyGroup>
+  <PropertyGroup>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
 
-    <PropertyGroup>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    </PropertyGroup>
-
-    <ItemGroup>
-      <PackageReference Include="Humanizer.Core" Version="2.5.16" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
-      <PackageReference Include="MongoDB.Driver" Version="2.7.3" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Humanizer.Core" Version="2.8.26" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
+    <PackageReference Include="MongoDB.Driver" Version="2.11.5" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="5.0.0" />
+  </ItemGroup>
 
 </Project>

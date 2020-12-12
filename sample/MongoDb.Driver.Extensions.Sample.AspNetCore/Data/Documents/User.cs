@@ -1,4 +1,3 @@
-using MongoDB.Bson;
 using MongoDB.Driver.Extensions.Documents;
 
 namespace MongoDb.Driver.Extensions.Sample.AspNetCore.Data.Documents

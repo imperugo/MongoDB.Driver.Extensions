@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using MongoDB.Driver.Extensions.Abstractions;
 using MongoDB.Driver.Extensions.Configurations;
 using MongoDB.Driver.Extensions.Documents;
-using MongoDB.Driver.Extensions.Extensions;
 using MongoDB.Driver.Extensions.Paging.Requests;
 using MongoDB.Driver.Extensions.Paging.Responses;
 
@@ -18,7 +17,7 @@ namespace MongoDB.Driver.Extensions.Implementations
         protected IMongoClient MongoClient { get; }
         protected string CollectionName { get; }
         protected string DatabaseName { get; }
-        
+
         protected RepositoryBase(MongoDbDatabaseConfiguration configuration,
             IMongoClient mongoClient,
             string dbName,
@@ -29,14 +28,10 @@ namespace MongoDB.Driver.Extensions.Implementations
             Configuration = configuration;
 
             if (namingHelper == null)
-            {
                 namingHelper = new DefaultMongoDbNamingHelper();
-            }
 
             if (collectionName == null)
-            {
                 collectionName = typeof(T).Name;
-            }
 
             CollectionName = namingHelper.GetCollectionName(collectionName);
             DatabaseName = namingHelper.GetDatabaseName(configuration, dbName);
@@ -66,16 +61,15 @@ namespace MongoDB.Driver.Extensions.Implementations
         public virtual async Task<bool> ExistAsync(FilterDefinition<T> filters, CancellationToken cancellation = default)
         {
             if (filters == null)
-            {
                 filters = Builders<T>.Filter.Empty;
-            }
-            
-            var result = await Collection.Find(filters)
-                    .Limit(1)
-                    .Project(x => x.Id)
-                    .FirstOrDefaultAsync(cancellation)
-                    .ConfigureAwait(false);
-            
+
+            var result = await Collection
+                .Find(filters)
+                .Limit(1)
+                .Project(x => x.Id)
+                .FirstOrDefaultAsync(cancellation)
+                .ConfigureAwait(false);
+
             return result != null;
         }
 
@@ -86,13 +80,13 @@ namespace MongoDB.Driver.Extensions.Implementations
 
         public virtual Task<ReplaceOneResult> SaveOrUpdateAsync(Expression<Func<T, bool>> predicate, T entity, CancellationToken cancellation = default)
         {
-            return Collection.ReplaceOneAsync(predicate, entity, new UpdateOptions { IsUpsert = true }, cancellation);
+            return Collection.ReplaceOneAsync(predicate, entity, new ReplaceOptions { IsUpsert = true }, cancellation);
         }
 
         public virtual Task<ReplaceOneResult> SaveOrUpdateAsync(T entity, CancellationToken cancellation = default)
         {
             var f = Builders<T>.Filter.Eq(x => x.Id, entity.Id);
-            return Collection.ReplaceOneAsync(f, entity, new UpdateOptions { IsUpsert = true }, cancellation);
+            return Collection.ReplaceOneAsync(f, entity, new ReplaceOptions { IsUpsert = true }, cancellation);
         }
 
         public virtual Task<T> GetByIdAsync(TK id, CancellationToken cancellation = default)
@@ -107,9 +101,7 @@ namespace MongoDB.Driver.Extensions.Implementations
         public virtual Task<IPagedResult<T>> GetPagedListAsync(SimplePagedRequest request, FilterDefinition<T> filters = null, SortDefinition<T> sort = null, CancellationToken cancellation = default)
         {
             if (filters == null)
-            {
                 filters = Builders<T>.Filter.Empty;
-            }
 
             return Collection.ToPagedResultAsync<T, TK>(filters, request, sort, cancellation);
         }
@@ -170,6 +162,11 @@ namespace MongoDB.Driver.Extensions.Implementations
             return Collection.Find(x => x.Id != null)
                 .Limit(1)
                 .CountDocumentsAsync(cancellation);
+        }
+
+        public virtual Task Drop(CancellationToken cancellation = default)
+        {
+            return Database.DropCollectionAsync(CollectionName, cancellation);
         }
 
         protected virtual string NormalizeDbName(string dbName)
