@@ -1,5 +1,10 @@
 # MongoDB.Driver.Extensions
 
+[![Nuget](https://img.shields.io/nuget/v/MongoDB.Driver.Extensions?style=flat-square)](https://www.nuget.org/packages/MongoDB.Driver.Extensions/)
+[![Nuget](https://img.shields.io/nuget/vpre/MongoDB.Driver.Extensions?style=flat-square)](https://www.nuget.org/packages/MongoDB.Driver.Extensions/)
+[![GitHub](https://img.shields.io/github/license/imperugo/MongoDB.Driver.Extensions?style=flat-square)](https://github.com/imperugo/MongoDB.Driver.Extensions/blob/main/LICENSE)
+
+
 **MongoDB.Driver.Extensions** is a library that extends [MongoDB.Driver](https://docs.mongodb.com/ecosystem/drivers/csharp/) allowing you a set of functionality needed by common applications.
 The library is completely compatible with the **.Net Standard 2.0**
 
@@ -47,15 +52,12 @@ public class User : DocumentBase<ObjectId>
 Now is time to create your repository:
 
 ```csharp
-internal class UserRepository : RepositoryBase<User,ObjectId>
+internal class UserRepository : RepositoryBase<User, ObjectId>
 {
-	public UserRepository(MongoDbDatabaseConfiguration configuration, 
-							IMongoClient mongoClient) 
-									: base(configuration, 
-											mongoClient, 
-											"MyDatabaseName")
-	{
-	}
+    public UserRepository( IMongoClient mongoClient)
+        : base(mongoClient, "MyDatabase", "MyCollectionName")
+    {
+    }
 }
 ```
 
@@ -69,30 +71,12 @@ IMongoClient client = new MongoClient(conf.ConnectionString);
 
 ```
 
-If you are using Castle Windsort is enough to do something like this:
-
-```csharp
-
-container.Register(Component.For<MongoDbDatabaseConfiguration>()
-				.Instance(conf)
-				.LifestyleSingleton());
-
-container.Register(Component.For<IMongoClient>()
-				.Instance(client)
-				.LifestyleSingleton());
-
-container.Register(Component.For<IRepository<User,ObjectId>>()
-				.ImplementedBy<UserRepository>()
-				.LifestyleSingleton());
-```
-
 In you are in Asp.Net Core:
 
 ```csharp
-services.AddSingleton<MongoDbDatabaseConfiguration>(conf);
-services.AddSingleton<IMongoClient>(client);
+services.AddMongoDb(x => x.ConnectionString = "mongodb://mongodbhost:27017/sample");
 
-services.AddSingleton<IRepository<User,ObjectId>, UserRepository>(client);
+services.AddSingleton<IRepository<User, ObjectId>, UserRepository>();
 
 
 ```
@@ -121,82 +105,18 @@ public class MyService : IMyService
     }
 }
 ```
+## Sample
 
-## DB name (Conventions and overrides)
+Take a look [here](https://github.com/imperugo/MongoDB.Driver.Extensions/tree/master/sample/MongoDb.Driver.Extensions.Sample.AspNetCore)
 
-Sometimes you have the same MongoDb Instance for all environments (I know this is not good) but you have to be sure you are using a different db name in order to work on new feature or test something that is almost ready for production.
+## License
 
-For example for the User db you could have something like:
+Imperugo.HttpRequestToCurl [MIT](https://github.com/imperugo/MongoDB.Driver.Extensions/blob/main/LICENSE) licensed.
 
-* Users (production environment);
-* UsersTest (test environment);
-* UserDev (dev environment);
+### Contributing
 
-As you saw in the example of `UserRepository` you can specify the name of the database you want to use; it means all you need to do is change this with `UserDev` and it works with Dev.
-The bad part of this is that you have to change the name everytime you need to switch between the different environments.
+Thanks to all the people who already contributed!
 
-Of course this is possible using this library without hardcode the db name into your code or adding tons of if.
-
-What you have to do is to add the suffix you want into the `MongoDbDatabaseConfiguration` class;
-
-```csharp
-var conf = new MongoDbDatabaseConfiguration();
-conf.ConnectionString = "mongodb://localhost:27017
-conf.EnvironmentSuffix = "Dev";
-```
-
-In this case, when you specify the database on your repository, is enough to say `Users` the repo will translate it in `UsersDev`;
-
-> If you want to override this behaviour with something more complicated of course you can just creating a class that inherits from `IMongoDbNamingHelper` apply your logic and register it to you dependency injection container
-
-##Collection Name (Conventions and overrides)
-
-Out of the box the collection name is calculated using the name of the document pluralised. In the example of the `User` the collection is `Users`, for a document called `vehicle` the collection name is `vehicles` and so on.
-
-If you want to change this behaviour you have two possible ways:
-
-1. Force the collection name in your repository;
-2. Add a dynamic behaviour; 
-
-### Force collection name
-
-```csharp
-internal class UserRepository : RepositoryBase<User,string>, IRepository<User,string>
-{
-	public UserRepository(MongoDbDatabaseConfiguration configuration, 
-							IMongoClient mongoClient) 
-									: base(configuration, 
-											mongoClient, 
-											"MyDatabase",
-											 null,
-											 "MyCollectionName")
-	{
-	}
-}
-```
-
-### Claculate dinamically the name of the collection
-
-Like mentioned for the database name, the same is valid here, just create a class that inherits from `IMongoDbNamingHelper` apply your logic and register it to you dependency injection container
-
-## IMongoDbNamingHelper
-
-As you understood the `IMongoDbNamingHelper` has an important role in this library, here the code of the default implementation:
-
-```csharp
-internal class DefaultMongoDbNamingHelper : IMongoDbNamingHelper
-{
-	public string GetDatabaseName(MongoDbDatabaseConfiguration configuration, string dbName)
-	{
-		return string.Concat(dbName,configuration.EnvironmentSuffix);
-	}
-
-	public string GetCollectionName(string requiredCollection)
-	{
-		return requiredCollection?.Pluralize().ToLowerInvariant();
-	}
-}
-```
-
-
-
+<a href="https://github.com/imperugo/MongoDB.Driver.Extensions/graphs/contributors">
+  <img src="https://contributors-img.web.app/image?repo=imperugo/MongoDB.Driver.Extensions" />
+</a>

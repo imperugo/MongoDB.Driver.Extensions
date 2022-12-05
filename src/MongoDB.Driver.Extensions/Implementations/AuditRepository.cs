@@ -1,57 +1,41 @@
-using System.Threading;
-using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver.Extensions.Abstractions;
-using MongoDB.Driver.Extensions.Configurations;
 
-namespace MongoDB.Driver.Extensions.Implementations
+namespace MongoDB.Driver.Extensions.Implementations;
+
+/// <summary>
+/// The repository that contains the methods needed to check if the connection to mongo id fine.
+/// </summary>
+public class AuditRepository : IAuditRepository
 {
-    public class AuditRepository : IAuditRepository
+    private const string ADMIN_DATABASE = "admin";
+    private readonly IMongoClient mongoClient;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AuditRepository"/> class.
+    /// </summary>
+    /// <param name="mongoClient">The instance of <see cref="IMongoClient"/>.</param>
+    public AuditRepository(IMongoClient mongoClient)
     {
-        private readonly IMongoClient mongoClient;
-        private readonly string databaseName;
+        this.mongoClient = mongoClient;
+    }
 
-        public AuditRepository(MongoDbDatabaseConfiguration configuration, IMongoClient mongoClient, IMongoDbNamingHelper namingHelper = null)
+    /// <inheritdoc/>
+    public async Task<DbStatus> CheckAsync(CancellationToken cancellationToken = default)
+    {
+        try
         {
-            this.mongoClient = mongoClient;
+            var command = new BsonDocument("ping", 1);
+            await mongoClient
+                .GetDatabase(ADMIN_DATABASE)
+                .RunCommandAsync<BsonDocument>(command, null, cancellationToken)
+                .ConfigureAwait(false);
 
-            databaseName = namingHelper.GetDatabaseName(configuration, "admin");
-            mongoClient.GetDatabase(databaseName);
+            return new DbStatus(ADMIN_DATABASE, true);
         }
-
-        public async Task<DbStatus> CheckAsync(CancellationToken cancellationToken = default)
+        catch
         {
-            try
-            {
-                var command = new BsonDocument("ping", 1);
-                await mongoClient
-                    .GetDatabase(databaseName)
-                    .RunCommandAsync<BsonDocument>(command, null, cancellationToken)
-                    .ConfigureAwait(false);
-
-                return new DbStatus(databaseName, true);
-            }
-            catch
-            {
-                return new DbStatus(databaseName, false);
-            }
-        }
-
-        public DbStatus Check()
-        {
-            try
-            {
-                var command = new BsonDocument("ping", 1);
-                mongoClient
-                    .GetDatabase(databaseName)
-                    .RunCommand<BsonDocument>(command);
-
-                return new DbStatus(databaseName, true);
-            }
-            catch
-            {
-                return new DbStatus(databaseName, false);
-            }
+            return new DbStatus(ADMIN_DATABASE, false);
         }
     }
 }

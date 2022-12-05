@@ -1,38 +1,32 @@
 using MongoDB.Driver.Extensions.Abstractions;
-using MongoDB.Driver.Extensions.Configurations;
 
-namespace MongoDB.Driver.Extensions.Implementations
+namespace MongoDB.Driver.Extensions.Implementations;
+
+/// <summary>
+/// The implementation of <see cref="IRepositoryHelper"/>.
+/// </summary>
+public class RepositoryHelper : IRepositoryHelper
 {
-    public class RepositoryHelper : IRepositoryHelper
+    private readonly IMongoClient mongoClient;
+
+    /// <summary>
+    /// Initializes a new instance of the RepositoryHelper class.
+    /// </summary>
+    /// <param name="mongoClient">The instance of <see cref="IMongoClient"/>.</param>
+    public RepositoryHelper(IMongoClient mongoClient)
     {
-        private readonly MongoDbDatabaseConfiguration configuration;
-        private readonly IMongoClient mongoClient;
-        private readonly IMongoDbNamingHelper namingHelper;
+        this.mongoClient = mongoClient;
+    }
 
-        public RepositoryHelper(IMongoClient mongoClient, MongoDbDatabaseConfiguration configuration, IMongoDbNamingHelper namingHelper = null)
-        {
-            this.mongoClient = mongoClient;
-            this.configuration = configuration;
-            this.namingHelper = namingHelper;
-        }
+    /// <inheritdoc/>
+    public virtual IMongoDatabase GetDatabase(string dbName)
+    {
+        return mongoClient.GetDatabase(dbName);
+    }
 
-        public IMongoDatabase GetDatabase(string dbName)
-        {
-            return mongoClient.GetDatabase(namingHelper.GetDatabaseName(configuration, dbName));
-        }
-
-        public IMongoCollection<T> GetIMongoCollection<T>(string dbName)
-        {
-            return GetIMongoCollection<T>(dbName, null);
-        }
-
-        public IMongoCollection<T> GetIMongoCollection<T>(string dbName, string collectionName)
-        {
-            if (collectionName == null)
-                collectionName = typeof(T).Name;
-
-            var calculatedName = namingHelper.GetCollectionName(collectionName);
-            return GetDatabase(dbName).GetCollection<T>(calculatedName);
-        }
+    /// <inheritdoc/>
+    public virtual IMongoCollection<T> GetIMongoCollection<T>(string dbName, string collectionName)
+    {
+        return GetDatabase(dbName).GetCollection<T>(collectionName);
     }
 }

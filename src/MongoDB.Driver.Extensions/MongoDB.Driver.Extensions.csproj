@@ -1,12 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Title>MongoDB.Driver.Extensions is a library that helps you to use MongoDB.</Title>
-    <Summary>MongoDB.Driver.Extensions is a library that helps you to use MongoDB.</Summary>
-    <AssemblyName>MongoDB.Driver.Extensions</AssemblyName>
-    <PackageId>MongoDB.Driver.Extensions</PackageId>
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <PackageProjectUrl>https://github.com/imperugo/MongoDB.Driver.Extensions</PackageProjectUrl>
-    <PackageTags>mongodb mongo nosql</PackageTags>
+    <PackageId>MongoDB.Driver.Extensions</PackageId>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>mongodb mongo nosql utility helper repository</PackageTags>
+    <PackageDescription>
+      MongoDB.Driver.Extensions is a library that helps you to stay in love with MongoDb.
+    </PackageDescription>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -14,10 +20,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Humanizer.Core" Version="2.8.26" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
-    <PackageReference Include="MongoDB.Driver" Version="2.11.5" />
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+    <PackageReference Include="MongoDB.Driver" Version="2.18.0" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="7.0.0" />
   </ItemGroup>
 
 </Project>

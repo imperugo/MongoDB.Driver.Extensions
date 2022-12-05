@@ -1,22 +1,14 @@
-using MongoDb.Driver.Extensions.Sample.AspNetCore.Data.Documents;
+using MongoDB.Bson;
 using MongoDB.Driver;
-using MongoDB.Driver.Extensions.Abstractions;
-using MongoDB.Driver.Extensions.Configurations;
 using MongoDB.Driver.Extensions.Implementations;
+using MongoDb.Driver.Extensions.Sample.AspNetCore.Data.Documents;
 
-namespace MongoDb.Driver.Extensions.Sample.AspNetCore.Data
+namespace MongoDb.Driver.Extensions.Sample.AspNetCore.Data;
+
+internal class UserRepository : RepositoryBase<User, ObjectId>
 {
-    internal class UserRepository : RepositoryBase<User, string>
+    public UserRepository( IMongoClient mongoClient)
+        : base(mongoClient, "MyDatabase", "MyCollectionName")
     {
-        public UserRepository(MongoDbDatabaseConfiguration configuration,
-                                IMongoClient mongoClient,
-                                IMongoDbNamingHelper namingHelper)
-                                        : base(configuration,
-                                                mongoClient,
-                                                "MyDatabase",
-                                                namingHelper,
-                                                 "MyCollectionName")
-        {
-        }
     }
 }
