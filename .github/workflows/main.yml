@@ -2,7 +2,7 @@ name: MongoDB.Driver.Extensions Build
 on:
   push:
     branches:
-      - main
+      - master
     tags:
       - "*.*.*"
 jobs:
